@@ -1,0 +1,101 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "4.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.TenantManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "Fawry.Application": {
+      "path": "src/Fawry.Application/Fawry.Application.abppkg",
+      "folder": "src"
+    },
+    "Fawry.Application.Tests": {
+      "path": "test/Fawry.Application.Tests/Fawry.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "Fawry.Domain.Shared": {
+      "path": "src/Fawry.Domain.Shared/Fawry.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "Fawry.Application.Contracts": {
+      "path": "src/Fawry.Application.Contracts/Fawry.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "Fawry.HttpApi": {
+      "path": "src/Fawry.HttpApi/Fawry.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "Fawry.HttpApi.Client": {
+      "path": "src/Fawry.HttpApi.Client/Fawry.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "Fawry.EntityFrameworkCore.Tests": {
+      "path": "test/Fawry.EntityFrameworkCore.Tests/Fawry.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "Fawry.EntityFrameworkCore": {
+      "path": "src/Fawry.EntityFrameworkCore/Fawry.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "Fawry.TestBase": {
+      "path": "test/Fawry.TestBase/Fawry.TestBase.abppkg",
+      "folder": "test"
+    },
+    "Fawry.Domain.Tests": {
+      "path": "test/Fawry.Domain.Tests/Fawry.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "Fawry.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/Fawry.HttpApi.Client.ConsoleTestApp/Fawry.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "Fawry.DbMigrator": {
+      "path": "src/Fawry.DbMigrator/Fawry.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "Fawry.HttpApi.Host": {
+      "path": "src/Fawry.HttpApi.Host/Fawry.HttpApi.Host.abppkg",
+      "folder": "src"
+    },
+    "Fawry.Domain": {
+      "path": "src/Fawry.Domain/Fawry.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}

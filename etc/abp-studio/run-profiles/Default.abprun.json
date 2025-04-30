@@ -1,0 +1,25 @@
+﻿{
+  "applications": {
+    "Fawry.HttpApi.Host": {
+      "type": "dotnet-project",
+      "launchUrl": "https://localhost:44346",
+      "path": "../../../src/Fawry.HttpApi.Host/Fawry.HttpApi.Host.csproj",
+      "kubernetesService": ".*-httpapihost$",
+      "healthCheckEndpoint": "/health-status",
+      "healthUiEndpoint": "/health-ui",
+      "execution": {
+        "order": 4
+      }
+    },
+    "Fawry.Angular": {
+      "type": "cli",
+      "workingDirectory": "../../../angular",
+      "startCommand": "./start.ps1",
+      "launchUrl": "http://localhost:4200",
+      "kubernetesService": ".*-angular$",
+      "execution": {
+        "order": 2
+      }    
+    }
+  }
+}
