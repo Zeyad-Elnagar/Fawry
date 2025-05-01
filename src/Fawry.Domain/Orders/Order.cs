@@ -20,7 +20,7 @@ namespace Fawry.Orders
         public DateTime OrderDate { get; set; }
         public OrderStatu Status { get; set; } = OrderStatu.Pending;
         public decimal TotalAmount { get; set; }
-        public int PaymentTypeId { get; set; }
+        public int? PaymentTypeId { get; set; }
         public virtual PaymentType PaymentType { get; set; }
         public List<OrderItem> OrderItems { get; set; } = new();
     }

@@ -11,15 +11,9 @@ namespace Fawry.Orders
 {
     public class CreateOrderDto
     {
-        [FromForm]
         public int? CustomerAddressId { get; set; }
-
-        [FromForm]
         public CreateCustomerAddressDto? NewAddress { get; set; }
-
-        [FromForm]
-        public int PaymentTypeId { get; set; }
-
-        public List<OrderItemDto> OrderItems { get; set; } = new();
+        public int? PaymentTypeId { get; set; }
+        public List<CreateOrderItemDto> OrderItems { get; set; } = new();
     }
 }

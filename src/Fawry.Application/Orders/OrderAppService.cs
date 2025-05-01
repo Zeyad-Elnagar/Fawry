@@ -49,91 +49,90 @@ namespace Fawry.Orders
             if (input.OrderItems == null || !input.OrderItems.Any())
                 throw new UserFriendlyException("يجب تحديد منتجات للطلب.");
 
-            var userId = CurrentUser.GetId(); // أو _currentUser.Id.Value;
+            var userId = CurrentUser.GetId();
 
-            var paymentType = await _paymentTypeRepository.FindAsync(input.PaymentTypeId)
-                ?? throw new UserFriendlyException("نوع الدفع غير موجود.");
-
-            CustomerAddress? selectedAddress = null;
-
-            if (input.NewAddress != null)
+            var order = new Order
             {
-                selectedAddress = ObjectMapper.Map<CreateCustomerAddressDto, CustomerAddress>(input.NewAddress);
-                selectedAddress.UserId = userId;
-                selectedAddress = await _customerAddressRepository.InsertAsync(selectedAddress, autoSave: true);
-                input.CustomerAddressId = selectedAddress.Id;
-            }
-            else if (input.CustomerAddressId.HasValue)
-            {
-                selectedAddress = await _customerAddressRepository.GetAsync(input.CustomerAddressId.Value);
-                if (selectedAddress.UserId != userId)
-                    throw new UserFriendlyException("العنوان لا يخص هذا المستخدم.");
-            }
-            else
-            {
-                throw new UserFriendlyException("يجب تحديد عنوان التوصيل.");
-            }
-
-            var order = ObjectMapper.Map<CreateOrderDto, Order>(input);
-            order.UserId = userId;
-            order.OrderDate = DateTime.Now;
-            order.Status = OrderStatu.Pending;
-            order.TotalAmount = 0;
-
-            await _orderRepository.InsertAsync(order, autoSave: true);
+                UserId = userId,
+                OrderDate = DateTime.Now,
+                Status = OrderStatu.Pending,
+                TotalAmount = 0,
+                OrderItems = new List<OrderItem>()
+            };
 
             decimal totalAmount = 0;
 
             foreach (var item in input.OrderItems)
             {
+                var product = await _productRepository.GetAsync(item.ProductId); // احصل على السعر من المنتج
+
                 var orderItem = new OrderItem
                 {
-                    OrderId = order.Id,
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice
+                    UnitPrice = product.Price, // هنا السعر من قاعدة البيانات
+                    TotalPrice = product.Price * item.Quantity
                 };
 
-                totalAmount += item.Quantity * item.UnitPrice;
-                await _orderItemRepository.InsertAsync(orderItem);
+                totalAmount += orderItem.TotalPrice;
+                order.OrderItems.Add(orderItem);
             }
 
             order.TotalAmount = totalAmount;
-            await _orderRepository.UpdateAsync(order, autoSave: true);
+
+            await _orderRepository.InsertAsync(order, autoSave: true);
 
             return ObjectMapper.Map<Order, OrderDto>(order);
         }
 
 
-        public async Task<OrderDto> ConfirmOrderPaymentAsync(int orderId)
+        public async Task<OrderDto> ConfirmOrderAsync(int orderId, ConfirmOrderDto input)
         {
-            var order = await _orderRepository.GetAsync(orderId);
+            var userId = CurrentUser.GetId();
+
+            var order = await _orderRepository.FirstOrDefaultAsync(x => x.Id == orderId && x.UserId == userId);
             if (order == null)
-                throw new EntityNotFoundException(typeof(Order), orderId);
+                throw new UserFriendlyException("الطلب غير موجود.");
 
-            // ✅ تحقق من طريقة الدفع
-            var paymentType = await _paymentTypeRepository.FindAsync(order.PaymentTypeId);
+            if (order.OrderItems == null || !order.OrderItems.Any())
+                throw new UserFriendlyException("الطلب لا يحتوي على منتجات.");
+
+            var address = await _customerAddressRepository.FirstOrDefaultAsync(x => x.Id == input.CustomerAddressId && x.UserId == userId);
+            if (address == null)
+                throw new UserFriendlyException("عنوان التوصيل غير صالح.");
+
+            var paymentType = await _paymentTypeRepository.FindAsync(input.PaymentTypeId);
             if (paymentType == null)
-                throw new UserFriendlyException("نوع الدفع المحدد غير موجود.");
+                throw new UserFriendlyException("نوع الدفع غير موجود.");
 
-            var orderItems = await _orderItemRepository.GetListAsync(x => x.OrderId == orderId);
+            order.CustomerAddressId = input.CustomerAddressId;
+            order.PaymentTypeId = input.PaymentTypeId;
+
+            decimal totalAmount = 0;
+            var orderItems = await _orderItemRepository.GetListAsync(x => x.OrderId == order.Id);
 
             foreach (var item in orderItems)
             {
                 var product = await _productRepository.GetAsync(item.ProductId);
 
                 if (product.StockQuantity < item.Quantity)
-                    throw new UserFriendlyException($"المنتج {product.Name} لا يحتوي على الكمية المطلوبة.");
+                    throw new UserFriendlyException($"المنتج '{product.Name}' لا يحتوي على الكمية المطلوبة.");
 
                 product.StockQuantity -= item.Quantity;
                 await _productRepository.UpdateAsync(product);
+
+                totalAmount += item.Quantity * item.UnitPrice;
             }
 
-            order.Status = OrderStatu.Delivered; // أو أي حالة مناسبة
-            await _orderRepository.UpdateAsync(order);
+            order.TotalAmount = totalAmount;
+            order.Status = OrderStatu.Delivered;
+
+            await _orderRepository.UpdateAsync(order, autoSave: true);
 
             return ObjectMapper.Map<Order, OrderDto>(order);
         }
+
+
 
         public async Task<bool> DeleteOrderAsync(int id)
         {
@@ -173,17 +172,21 @@ namespace Fawry.Orders
 
         public async Task<OrderDto> GetOrderAsync(int id)
         {
-            var order = await _orderRepository.GetAsync(id);
-            var orderDto = ObjectMapper.Map<Order, OrderDto>(order);
+            var userId = CurrentUser.GetId();
+            var order = await _orderRepository.GetAsync(id, includeDetails: true);
 
-            var paymentType = await _paymentTypeRepository.GetAsync(order.PaymentTypeId);
-            orderDto.PaymentTypeName = paymentType?.Name;
+            if (order.UserId != userId)
+                throw new UserFriendlyException("لا يمكنك عرض هذا الطلب.");
 
-            var orderItems = await _orderItemRepository.GetListAsync(x => x.OrderId == id);
-            orderDto.OrderItems = ObjectMapper.Map<List<OrderItem>, List<OrderItemDto>>(orderItems);
-
-            return orderDto;
+            return new OrderDto
+            {
+                Id = order.Id,
+                TotalAmount = order.TotalAmount,
+                OrderItems = ObjectMapper.Map<List<OrderItem>, List<OrderItemDto>>(order.OrderItems.ToList())
+            };
         }
+
+
 
         public async Task<OrderDto> UpdateOrderAsync(int id, UpdateOrderDto input)
         {

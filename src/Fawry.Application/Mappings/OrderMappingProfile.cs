@@ -15,6 +15,7 @@ namespace Fawry.Mappings
             CreateMap<Order, OrderDto>();
             CreateMap<CreateOrderDto, Order>();
             CreateMap<UpdateOrderDto, Order>();
+
         }
     }
 }

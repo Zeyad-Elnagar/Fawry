@@ -28,7 +28,8 @@ namespace Fawry.Configuration
             builder.HasOne(x => x.PaymentType)
                    .WithMany()
                    .HasForeignKey(x => x.PaymentTypeId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Restrict)
+                   .IsRequired(false);
             builder.HasOne(x => x.CustomerAddress)
                    .WithMany()
                    .HasForeignKey(x => x.CustomerAddressId)

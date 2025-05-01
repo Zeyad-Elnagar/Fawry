@@ -59,11 +59,19 @@ namespace Fawry.Controllers
         //    return await _orderAppService.ChangeOrderStatusAsync(id, newStatus);
         //}
 
+        //[HttpPut("{id}/confirm-payment")]
+        //public async Task<OrderDto> ConfirmOrderAsync(int id)
+        //{
+        //    return await _orderAppService.ConfirmOrderAsync(id);
+        //}
+
         [HttpPut("{id}/confirm-payment")]
-        public async Task<OrderDto> ConfirmOrderPaymentAsync(int id)
+        public async Task<OrderDto> ConfirmOrderAsync(int id, [FromBody] ConfirmOrderDto input)
         {
-            return await _orderAppService.ConfirmOrderPaymentAsync(id);
+            return await _orderAppService.ConfirmOrderAsync(id, input);
         }
+
+
 
     }
 }

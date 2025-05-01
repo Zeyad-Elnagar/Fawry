@@ -15,6 +15,6 @@ namespace Fawry.Orders
         Task<OrderDto> CreateOrderAsync(CreateOrderDto input);
         Task<OrderDto> UpdateOrderAsync(int id, UpdateOrderDto input);
         Task<bool> DeleteOrderAsync(int id);
-        Task<OrderDto> ConfirmOrderPaymentAsync(int orderId);
+        Task<OrderDto> ConfirmOrderAsync(int orderId, ConfirmOrderDto input);
     }
 }
