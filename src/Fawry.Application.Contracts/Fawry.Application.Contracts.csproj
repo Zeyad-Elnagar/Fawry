@@ -10,9 +10,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fawry.Domain.Shared\Fawry.Domain.Shared.csproj" />
+    <ProjectReference Include="..\Fawry.Domain\Fawry.Domain.csproj" />
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
